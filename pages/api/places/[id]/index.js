@@ -17,6 +17,19 @@ export default async function handler(request, response) {
     // response.status(200).json({ place: place, comments: comments });
   }
 
+  if (request.method === "PATCH") {
+    try {
+      await Place.findByIdAndUpdate(id, {
+        $set: request.body,
+      });
+      return response
+        .status(200)
+        .json({ status: "place successfully updated" });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   // const place = db_places.find((place) => place._id.$oid === id);
   // const comment = place?.comments;
   // const allCommentIds = comment?.map((comment) => comment.$oid) || [];
