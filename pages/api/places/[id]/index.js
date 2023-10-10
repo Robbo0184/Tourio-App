@@ -1,11 +1,17 @@
-import { db_places } from "../../../../lib/db_places";
-import { db_comments } from "../../../../lib/db_comments";
+import dbConnect from "../../../../db/connect";
 
-export default function handler(request, response) {
+
+// import { db_comments } from "../../../../lib/db_comments";
+
+export default async function handler(request, response) {
   const { id } = request.query;
 
+  if (request.method === "GET") {
+    const place = await Place.findById(id)
+  }
+
   if (!id) {
-    return;
+    return ;
   }
 
   const place = db_places.find((place) => place._id.$oid === id);
