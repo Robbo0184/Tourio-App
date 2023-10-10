@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { StyledButton } from "./StyledButton.js";
+import { useState } from "react";
 
 export const FormContainer = styled.form`
   display: grid;
@@ -25,6 +26,8 @@ export const Label = styled.label`
 `;
 
 export default function Form({ onSubmit, formName, defaultData }) {
+  console.log("defaultData", defaultData);
+
   function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
