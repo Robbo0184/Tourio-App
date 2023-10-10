@@ -11,6 +11,7 @@ export default function EditPage() {
   const { data: place, isLoading, error } = useSWR(`/api/places/${id}`);
 
   async function editPlace(place) {
+    const response = await fetch("api/");
     console.log("Place edited (but not really...)");
   }
 
@@ -22,7 +23,7 @@ export default function EditPage() {
       <Link href={`/places/${id}`} passHref legacyBehavior>
         <StyledLink justifySelf="start">back</StyledLink>
       </Link>
-      <Form onSubmit={editPlace} formName={'edit-place'} defaultData={place} />
+      <Form onSubmit={editPlace} formName={"edit-place"} defaultData={place} />
     </>
   );
 }
