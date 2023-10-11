@@ -3,8 +3,8 @@ import { FormContainer, Input, Label } from "./Form";
 import { StyledButton } from "./StyledButton.js";
 import useSWR from "swr";
 
-export default function Comments({ locationName, comments, id }) {
-  const {mutate} = useSWR(`/api/places/${id}`)
+export default function Comments({ locationName, id }) {
+  const { mutate, data } = useSWR(`/api/places/${id}`);
   const Article = styled.article`
     display: flex;
     flex-direction: column;
@@ -19,11 +19,11 @@ export default function Comments({ locationName, comments, id }) {
     }
   `;
 
- async function handleSubmitComment(e) {
+  async function handleSubmitComment(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const commentData = Object.fromEntries(formData);
-    const response = await fetch(`/api/places/${id}`, {
+    const response = await fetch(`/api/places/${id}/comments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,6 +37,26 @@ export default function Comments({ locationName, comments, id }) {
     }
   }
 
+  async function handleDeleteComment(_id) {
+    const response = await fetch(`/api/places/${id}/comments`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: _id }),
+    });
+    if (response.ok) {
+      await response.json();
+      mutate();
+    } else {
+      console.error(`Error: ${response.status}`);
+    }
+  }
+
+  if (!data) return <h1>...is Loading</h1>;
+
+  const { comments } = data;
+
   return (
     <Article>
       <FormContainer onSubmit={handleSubmitComment}>
@@ -49,7 +69,7 @@ export default function Comments({ locationName, comments, id }) {
       {comments && (
         <>
           <h1> {comments.length} fans commented on this place:</h1>
-          {comments.map(({ name, comment }, idx) => {
+          {comments.map(({ name, comment, _id }, idx) => {
             return (
               <>
                 <p key={idx}>
@@ -58,6 +78,9 @@ export default function Comments({ locationName, comments, id }) {
                   </small>
                 </p>
                 <span>{comment}</span>
+                <button type="button" onClick={() => handleDeleteComment(_id)}>
+                  ❌
+                </button>
               </>
             );
           })}
