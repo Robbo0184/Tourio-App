@@ -1,5 +1,6 @@
 import dbConnect from "../../../../db/connect";
 import Place from "../../../../db/models/Place";
+import Comment from "../../../../db/models/Comments";
 
 // import { db_comments } from "../../../../lib/db_comments";
 
@@ -9,7 +10,7 @@ export default async function handler(request, response) {
     return;
   }
   if (request.method === "GET") {
-    const place = await Place.findById(id);
+    const place = await Place.findById(id).populate('comments');
     if (!place) {
       return response.status(404).json({ status: "Not found" });
     }
@@ -28,17 +29,34 @@ export default async function handler(request, response) {
     } catch (e) {
       console.log(e);
     }
-}
+  }
 
-if (request.method === "DELETE") {
-   const placeToDelete = await Place.findByIdAndDelete(id);
-   return response.status(200).json(placeToDelete)
-}
+  if (request.method === "POST") {
+    try {
+      const newComment = await Comment.create(request.body);
+      await Place.findByIdAndUpdate(
+        id,
+        { $push: { comments: newComment._id } },
+        { new: true }
+      ); response.status(200).json({ succes: "comment successfully created" });
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
-  // const place = db_places.find((place) => place._id.$oid === id);
-  // const comment = place?.comments;
-  // const allCommentIds = comment?.map((comment) => comment.$oid) || [];
-  // const comments = db_comments.filter((comment) =>
-  //   allCommentIds.includes(comment._id.$oid)
-  // );
+  if (request.method === "DELETE") {
+    const placeToDelete = await Place.findByIdAndDelete(id);
+    await Comment.deleteMany({
+      _id: { $in: placeToDelete.comments }
+    })
+    response.status(260).json("Place and comments deleted");
+    return response.status(200).json(placeToDelete)
+  }
+
+  const place = db_places.find((place) => place._id.$oid === id);
+  const comment = place?.comments;
+  const allCommentIds = comment?.map((comment) => comment.$oid) || [];
+  const comments = db_comments.filter((comment) =>
+    allCommentIds.includes(comment._id.$oid)
+  );
 }

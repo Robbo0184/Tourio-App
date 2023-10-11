@@ -75,7 +75,7 @@ export default function DetailsPage() {
           Delete
         </StyledButton>
       </ButtonContainer>
-      {/* <Comments locationName={place.name} comments={comments} /> */}
+      <Comments locationName={place.name} comments={place.comments} id={place._id} /> 
     </>
   );
 }
