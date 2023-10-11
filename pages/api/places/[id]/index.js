@@ -28,7 +28,12 @@ export default async function handler(request, response) {
     } catch (e) {
       console.log(e);
     }
-  }
+}
+
+if (request.method === "DELETE") {
+   const placeToDelete = await Place.findByIdAndDelete(id);
+   return response.status(200).json(placeToDelete)
+}
 
   // const place = db_places.find((place) => place._id.$oid === id);
   // const comment = place?.comments;
